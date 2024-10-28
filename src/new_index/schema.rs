@@ -277,6 +277,7 @@ impl Indexer {
             to_add.len(),
             self.from
         );
+        // 存储blocksRow,txRow,utxo
         start_fetcher(self.from, &daemon, to_add)?.map(|blocks| self.add(&blocks));
         self.start_auto_compactions(&self.store.txstore_db);
 
@@ -286,6 +287,7 @@ impl Indexer {
             to_index.len(),
             self.from
         );
+        // 存储地址交易列表
         start_fetcher(self.from, &daemon, to_index)?.map(|blocks| self.index(&blocks));
         self.start_auto_compactions(&self.store.history_db);
 
@@ -1301,7 +1303,7 @@ fn index_transaction(
             );
             rows.push(history.into_row());
 
-            if iconfig.address_search {
+            if iconfig.address_search { // 保存所有address=>{}
                 if let Some(row) = addr_search_row(&txo.script_pubkey, iconfig.network) {
                     rows.push(row);
                 }
@@ -1632,6 +1634,7 @@ pub struct TxHistoryRow {
     pub key: TxHistoryKey,
 }
 
+// 地址交易列表
 impl TxHistoryRow {
     fn new(
         script: &Script,
@@ -1725,7 +1728,7 @@ struct TxEdgeKey {
 struct TxEdgeRow {
     key: TxEdgeKey,
 }
-
+// utxo 使用列表
 impl TxEdgeRow {
     fn new(
         funding_txid: FullHash,
